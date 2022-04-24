@@ -89,6 +89,16 @@ class _FancyTabs extends State<FancyTabs> {
     super.initState();
   }
 
+  Future<bool> _waitNonzero() async {
+    while (true) {
+      if (MediaQuery.of(context).size.width != 0) {
+        return true;
+      }
+      await Future.delayed(const Duration(milliseconds: 16));
+    }
+    throw UnimplementedError();
+  }
+
   void initTabs() {
     int index = 0;
     for (var label in widget.labels) {
@@ -107,48 +117,61 @@ class _FancyTabs extends State<FancyTabs> {
   Widget build(BuildContext context) {
     final size = widget.size;
 
-    return LayoutBuilder(builder: (_, constraints) {
-      if (_pSize == null) {
-        _pSize = Size(
-            (constraints.maxWidth - 2 * (widget.labels.length * 2)) /
-                widget.labels.length,
-            double.infinity);
-        initTabs();
-      }
+    return FutureBuilder<bool>(
+      builder: (ctx, snapshot) {
+        if (snapshot.hasData) {
+          return LayoutBuilder(builder: (_, constraints) {
+            if (_pSize == null) {
+              _pSize = Size(
+                  (constraints.maxWidth - 2 * (widget.labels.length * 2)) /
+                      widget.labels.length,
+                  double.infinity);
+              initTabs();
+            }
 
-      return Container(
-        child: Stack(
-          children: [
-            Row(children: tabs, mainAxisAlignment: MainAxisAlignment.start),
-            ValueListenableBuilder<int>(
-                valueListenable: selected,
-                builder: (_, selected, __) => AnimatedPositioned(
-                      child: _FancyTab(
-                        size: Size(perSize.width, size.height),
-                        label: widget.labels[selected],
-                        selected: true,
-                        selectedColor: widget.selectedColor,
-                        style: widget.style,
-                        myIndex: selected,
-                        controller: controller,
-                      ),
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.easeOutExpo,
-                      key: _key,
-                      top: 0,
-                      bottom: 0,
-                      left: (perSize.width * selected.toDouble()) +
-                          (selected == 0 ? 0.0 : 4 * selected.toDouble()),
-                    ))
-          ],
-        ),
-        height: size.height,
-        width: size.width,
-        decoration: BoxDecoration(
-            color: widget.unselectedColor,
-            borderRadius: BorderRadius.circular(widget.outerRadius)),
-      );
-    });
+            return Container(
+              child: Stack(
+                children: [
+                  Row(
+                      children: tabs,
+                      mainAxisAlignment: MainAxisAlignment.start),
+                  ValueListenableBuilder<int>(
+                      valueListenable: selected,
+                      builder: (_, selected, __) => AnimatedPositioned(
+                            child: _FancyTab(
+                              size: Size(perSize.width, size.height),
+                              label: widget.labels[selected],
+                              selected: true,
+                              selectedColor: widget.selectedColor,
+                              style: widget.style,
+                              myIndex: selected,
+                              controller: controller,
+                            ),
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeOutExpo,
+                            key: _key,
+                            top: 0,
+                            bottom: 0,
+                            left: (perSize.width * selected.toDouble()) +
+                                (selected == 0 ? 0.0 : 4 * selected.toDouble()),
+                          ))
+                ],
+              ),
+              height: size.height,
+              width: size.width,
+              decoration: BoxDecoration(
+                  color: widget.unselectedColor,
+                  borderRadius: BorderRadius.circular(widget.outerRadius)),
+            );
+          });
+        } else if (snapshot.hasError) {
+          throw snapshot.error as Error;
+        }
+
+        return const SizedBox();
+      },
+      future: _waitNonzero(),
+    );
   }
 }
 

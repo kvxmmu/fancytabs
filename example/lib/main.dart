@@ -20,15 +20,15 @@ class ExampleApp extends StatelessWidget {
         child: Column(
           children: [
             FancyTabs(
-                labels: const ["1", "2", "3", "4", "5"],
+                labels: const ["1", "2"],
                 onChanged: (index) => print(index),
                 controller: controller),
             const SizedBox(height: 16),
             Wrap(
               children: [
                 ElevatedButton(
-                    onPressed: () => controller.jumpTo(2),
-                    child: const Text("3"))
+                    onPressed: () => controller.jumpTo(1),
+                    child: const Text("2"))
               ],
             )
           ],
