@@ -108,6 +108,7 @@ class _FancyTabs extends State<FancyTabs> {
         style: widget.style,
         myIndex: index,
         controller: controller,
+        radius: widget.innerRadius,
       ));
       ++index;
     }
@@ -146,6 +147,7 @@ class _FancyTabs extends State<FancyTabs> {
                               style: widget.style,
                               myIndex: selected,
                               controller: controller,
+                              radius: widget.innerRadius,
                             ),
                             duration: const Duration(milliseconds: 400),
                             curve: Curves.easeOutExpo,
@@ -187,6 +189,8 @@ class _FancyTab extends StatelessWidget {
 
   final int myIndex;
 
+  final double radius;
+
   const _FancyTab({
     Key? key,
     required this.size,
@@ -194,6 +198,7 @@ class _FancyTab extends StatelessWidget {
     required this.style,
     required this.controller,
     required this.myIndex,
+    required this.radius,
     this.selectedColor = Colors.transparent,
     this.selected = false,
   }) : super(key: key);
@@ -209,7 +214,7 @@ class _FancyTab extends StatelessWidget {
         margin: const EdgeInsets.all(2),
         decoration: selected
             ? BoxDecoration(
-                borderRadius: selected ? BorderRadius.circular(2) : null,
+                borderRadius: selected ? BorderRadius.circular(radius) : null,
                 color: selectedColor,
                 boxShadow: const <BoxShadow>[
                     BoxShadow(
